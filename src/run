@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Change to the src directory
+PARENT_DIR=$(cd "$(dirname ${BASH_SOURCE[0]})" ; pwd -P)
+
+cd "$PARENT_DIR"
+
+# Compile
+javac *.java
+
+# Run
+java GroceryApp
