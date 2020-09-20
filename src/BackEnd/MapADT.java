@@ -8,4 +8,5 @@ public interface MapADT<KeyType, ValueType> {
     public boolean containsKey(KeyType key);
     public ValueType remove(KeyType key);
     public void clear();
+
 }

@@ -63,7 +63,7 @@ public interface BackEnd {
     return the subtotal of the cart
     it should be positive, but it will be -1 if there is unexpected error
     */
-    public int subtotal();
+    public float subtotal();
 
     /*
     Clear the cart and calculate new quantities of items in the cart

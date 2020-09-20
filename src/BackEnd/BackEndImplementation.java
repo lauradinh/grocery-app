@@ -5,23 +5,24 @@ public class BackEndImplementation implements BackEnd {
 
     private boolean login=false;
     private MapADT<Integer, GroceryItem> groceryInfo;
-    private MapADT<Integer, GroceryItem> cart;
+    private SimpleHashTable<Integer, CartItem> cart;
     private MapADT<String, String> accounts; // used to store worker usernames and passwords
 
-    public BackEndImplementation() {
-        groceryInfo=DataAccess.getItems();
+    public BackEndImplementation() throws IOException {
+        groceryInfo = new SimpleHashTable<Integer, GroceryItem>(DataAccess.getItems());
+        cart = new SimpleHashTable<Integer, CartItem>();
     }
 
     public boolean login(String username, String password) {
-        try{
-            String truePassword=accounts.get(username);
-            if(password.equals(truePassword))
+        try {
+            String truePassword = accounts.get(username);
+            if (password.equals(truePassword))
                 return true;
             return false;
-        }catch(Exception e) {
+        } catch (Exception e) {
             return false;
         }
-    };
+    }
 
     public void quit() {
         login = false;
@@ -36,11 +37,11 @@ public class BackEndImplementation implements BackEnd {
     public int addItem(int id, String name, double price, int quantity) {
         if (!login)
             return -1;
-        if (!checkParameter(id, name, priec, quantity))
+        if (!checkParameter(id, name, price, quantity))
             return -2;
         GroceryItem item = new GroceryItem(id, name, price, quantity);
-        if (!groceryInfo.put(id, GroceryItem)) ;
-        return -2;
+        if (!groceryInfo.put(id, item))
+            return -2;
         return 0;
     }
 
@@ -70,7 +71,7 @@ public class BackEndImplementation implements BackEnd {
 
     public boolean saveChange() {
         try {
-            DataAccess.updateItems(groceryInfo);
+            DataAccess.updateItems(((SimpleHashTable) groceryInfo).getMap());
         } catch (IOException e) {
             return false;
         }
@@ -81,15 +82,15 @@ public class BackEndImplementation implements BackEnd {
         try {
             GroceryItem item = groceryInfo.get(id);
             try {
-                GroceryItem cartItem = cart.get(id);
-                if (cartItem.getQuantity() > item.getQuantity())
+                CartItem cartItem = cart.get(id);
+                if (cartItem.getQuantity() >= item.getQuantity())
                     return -2;
                 cartItem.setQuantity(cartItem.getQuantity() + 1);
                 return 0;
             } catch (NoSuchElementException e) {
                 if (item.getQuantity() <= 0)
                     return -2;
-                GroceryItem cartItem = new GroceryItem(id, item.name, item.price, 1);
+                CartItem cartItem = new CartItem(item, 1);
                 cart.put(id, cartItem);
                 return 0;
             }
@@ -100,12 +101,12 @@ public class BackEndImplementation implements BackEnd {
 
     public boolean removeFromCart(int id) {
         try {
-            GroceryItem item = cart.get(id);
+            CartItem item = cart.get(id);
             if (item.getQuantity() > 1) {
                 item.setQuantity(item.getQuantity() - 1);
                 return true;
             }
-            if (cart.remove(item) != null)
+            if (cart.remove(id) != null)
                 return true;
             else
                 return false;
@@ -114,13 +115,13 @@ public class BackEndImplementation implements BackEnd {
         }
     }
 
-    public int subtotal() {
-        Integer[] keys = cart.list(); // need to implement
-        int subtotal = 0;
+    public float subtotal() {
+        Object[] keys = cart.keys();
+        float subtotal = 0;
         for (int i = 0; i < keys.length; i++) {
             try {
-                GroceryItem item = cart.get(keys[i]);
-                subtotal += item.getPrice() * item.getQuantity();
+                CartItem item = cart.get((Integer) keys[i]);
+                subtotal += item.getItem().getPrice() * item.getQuantity();
             } catch (NoSuchElementException e) {
                 return -1;
             }
@@ -129,17 +130,21 @@ public class BackEndImplementation implements BackEnd {
     }
 
     public boolean checkout() {
-        Integer[] keys = cart.list(); // need to implement
-        for(int i=0;i<keys.length;i++) {
+        Object[] keys = cart.keys();
+        for (int i = 0; i < keys.length; i++) {
             try {
-                GroceryItem cartItem = cart.get(keys[i]);
-                GroceryItem item=groceryInfo.get(keys[i]);
-                item.setQuantity(item.getQuantity()-cartItem.getQuantity());
+                CartItem cartItem = cart.get((Integer) keys[i]);
+                GroceryItem item = groceryInfo.get((Integer) keys[i]);
+                item.setQuantity(item.getQuantity() - cartItem.getQuantity());
             } catch (NoSuchElementException e) {
                 return false;
             }
         }
         cart.clear();
         return true;
+    }
+
+    public SimpleHashTable getCart() {
+        return cart;
     }
 }
