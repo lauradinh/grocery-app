@@ -1,74 +1,89 @@
+
 public interface BackEnd {
-    /*
-    Allow workers to login
-    Return:
-    If the worker logins successfully, return true. Otherwise return false
-    */
-    public boolean login(String username, String password);
 
-    /*quit from the login state*/
-    public void quit();
+  /**
+   * 
+   * Method to allow workers to login
+   * 
+   * @param username the worker's username to log in
+   * @param password the worker's password to log in
+   * @return true if the worker logs in successfully, false otherwise
+   */
+  public boolean login(String username, String password);
 
-    /*
-    Allow workers to add new items
-    Return:
-    If adding the item successfully, return 0
-    If the worker does not login, return -1
-    If the name, price, or quantity is not valid, return -2
-     */
-    public int addItem(int id, String name, double price, int quantity);
+  /**
+   * Method to log out of the worker's account
+   */
+  public void quit();
 
-    /*
-    Allow workers to edit any item in the catalogue
-    Return:
-    If editing the item successfully, return 0
-    If the worker does not login, return -1
-    If the id, name, price, or quantity is not valid, return -2
-    */
-    public int editItem(int id, String newName, double newPrice, int newQuantity);
+  /**
+   * Method to allow workers to add new items
+   * 
+   * @param id       id number of item
+   * @param name     name of the item
+   * @param price    item's price
+   * @param quantity item's quantity
+   * @return 0 if the item was added successfully, -1 if the worker hasn't logged in, -2 for any
+   *         invalid input data
+   */
+  public int addItem(int id, String name, double price, int quantity);
 
-    /*
-    Allow workers to delete any item in the catalogue
-    Return:
-    If deleting the item successfully, return 0
-    If the worker does not login or the program, return -1
-    If the id is not valid or does not exist, return -2
-    */
-    public int removeItem(int id);
+  /**
+   * Allow workers to edit any item in the catalogue
+   * 
+   * @param id          id number of the item
+   * @param newName     name that the item should be given
+   * @param newPrice    price that the item should be given
+   * @param newQuantity new quantity of the item
+   * @return 0 if the item was successfully edited, -1 if the worker does not login, and -2 for any
+   *         invalid input data
+   */
+  public int editItem(int id, String newName, double newPrice, int newQuantity);
 
-    /*
-    save the change of the item catalogue
-    Return:
-    If save changes successfully, return true. Otherwise return false.
-    */
-    public boolean saveChange();
+  /**
+   * Method to allow workers to delete any items in the catalogue
+   * 
+   * @param id id number of the item
+   * @return 0 if the item is deleted successfully, -1 if the worker hasn't logged in, -2 if the id
+   *         is invalid
+   */
+  public int removeItem(int id);
 
-    /*
-    Allow the user to add items to the cart without login
-    Return:
-    If adding successfully, return 0
-    If the id is not valid, return -1
-    If the item quantity is not greater than 0, return -2
-    */
-    public int addToCart(int id);
+  /**
+   * Method to save the changes in the item catalogue
+   * 
+   * @return true if the changed were saved successfully, false otherwise
+   */
+  public boolean saveChange();
 
-    /*
-    Allow the user to delete items in the cart without login
-    Return:
-    If deleting successfully, return true, else if the id is not valid or not in the cart, return false
-    */
-    public boolean removeFromCart(int id);
+  /**
+   * Allow the user to add items to the cart without login
+   * 
+   * @param id id number of the item
+   * @return 0 if the item was added successfully, -1 if the id number is invalid, -2 if the item
+   *         quantity is negative
+   */
+  public int addToCart(int id);
 
-    /*
-    return the subtotal of the cart
-    it should be positive, but it will be -1 if there is unexpected error
-    */
-    public float subtotal();
+  /**
+   * Allow the user to delete items in the cart without login
+   * 
+   * @param id id number of the item
+   * @return true if the item was removed successfully, false otherwise
+   */
+  public boolean removeFromCart(int id);
 
-    /*
-    Clear the cart and calculate new quantities of items in the cart
-    Return:
-    If success return true, otherwise return false
-    */
-    public boolean checkout();
+  /**
+   * Method that returns the subtotal of prices of items in the cart
+   * 
+   * @return subtotal amount, -1 if there is an unexpected error
+   */
+  public float subtotal();
+
+  /**
+   * Method that clears the cart and calculates the remaining quantities of grocery items after sale
+   * 
+   * @return true if successful, false otherwise
+   */
+  public boolean checkout();
 }
