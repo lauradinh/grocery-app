@@ -5,12 +5,12 @@ import java.io.IOException;
 public class BackEndImplementation implements BackEnd {
   private boolean loggedIn = false;
   private HashTable<Integer, GroceryItem> groceryInfo;
-  private ArrayList<CartItem> cart;
+  private HashTable<Integer, CartItem> cart;
   private MapADT<String, String> accounts; // used to store worker usernames and passwords
 
   public BackEndImplementation() throws IOException {
     groceryInfo = DataAccess.getItems();
-    cart = new ArrayList<CartItem>();
+    cart = new HashTable<Integer, CartItem>();
   }
 
   public boolean login(String username, String password) {
@@ -95,7 +95,7 @@ public class BackEndImplementation implements BackEnd {
           return -2; // item unavailable
         }
         CartItem cartItem = new CartItem(item, 1);
-        cart.add(cartItem);
+        cart.put(id, cartItem);
         return 0;
       }
     } catch (NoSuchElementException e) {
@@ -121,9 +121,10 @@ public class BackEndImplementation implements BackEnd {
 
   public float subtotal() {
     float subtotal = 0;
+    Object[] keys=cart.keySet().toArray();
     for (int i = 0; i < cart.size(); i++) {
       try {
-        CartItem item = cart.get(i);
+        CartItem item = cart.get((Integer)keys[i]);
         subtotal += item.getItem().getPrice() * item.getQuantity();
       } catch (NoSuchElementException e) {
         return -1; // error in fetching data
@@ -133,9 +134,10 @@ public class BackEndImplementation implements BackEnd {
   }
 
   public boolean checkout() {
+    Object[] keys=cart.keySet().toArray();
     for (int i = 0; i < cart.size(); i++) {
       try {
-        CartItem cartItem = cart.get(i);
+        CartItem cartItem = cart.get((Integer)keys[i]);
         GroceryItem item = groceryInfo.get(cartItem.getItem().getId());
         item.setQuantity(item.getQuantity() - cartItem.getQuantity());
       } catch (NoSuchElementException e) {
@@ -145,9 +147,4 @@ public class BackEndImplementation implements BackEnd {
     cart.clear();
     return true;
   }
-
-  public ArrayList<CartItem> getCart() {
-    return cart;
-  }
-
 }
