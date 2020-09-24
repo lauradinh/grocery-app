@@ -1,11 +1,9 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 
 public class GroceryApp {
 	public static void main(String[] args) {
-		// TODO: refactor this to implement our hash table
-		HashMap<Integer, GroceryItem> groceryItems;
+		HashTable<Integer, GroceryItem> groceryItems;
 
 		try {
 			groceryItems = DataAccess.getItems();
@@ -18,7 +16,7 @@ public class GroceryApp {
 		}
 
 		/* Just testing the methods */
-		groceryItems.keySet().forEach((key) -> System.out.println(groceryItems.get(key)));
+		groceryItems.keySet().forEach((key) -> System.out.printf("%d %s\n", key, groceryItems.get(key)));
 
 		try {
 			DataAccess.updateItems(groceryItems);

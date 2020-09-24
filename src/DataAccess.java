@@ -1,21 +1,20 @@
-import java.util.HashMap;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.URISyntaxException;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.BufferedWriter;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 
-// TODO: refactor this to implement our hash table
 public class DataAccess {
 	public static final String PATH = "./data/grocery-items.csv";
 
-	public static HashMap<Integer, GroceryItem> getItems() throws FileNotFoundException, IOException {
-		var br = new BufferedReader(new InputStreamReader(new FileInputStream(PATH)));
+	public static HashTable<Integer, GroceryItem> getItems() throws FileNotFoundException, IOException {
+		var br = new BufferedReader(new InputStreamReader(DataAccess.class.getClassLoader().getResourceAsStream(PATH)));
 
-		var map = new HashMap<Integer, GroceryItem>();
+		var map = new HashTable<Integer, GroceryItem>();
 
 		for (String row = br.readLine(); row != null; row = br.readLine()) {
 			String[] columns = row.split(",");
@@ -33,8 +32,15 @@ public class DataAccess {
 		return map;
 	}
 
-	public static void updateItems(HashMap<Integer, GroceryItem> items) throws IOException {
-		var bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(PATH)));
+	public static void updateItems(HashTable<Integer, GroceryItem> items) throws IOException {
+		BufferedWriter bw;
+
+		try {
+			bw = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(new File(DataAccess.class.getResource(PATH).toURI().getPath()))));
+		} catch (URISyntaxException e) {
+			throw new IOException();
+		}
 
 		for (var key : items.keySet()) {
 			GroceryItem item = items.get(key);
